@@ -1,0 +1,32 @@
+@use '../base/variables' as *;
+
+.navbar.navbar-dark {
+  background-color: $card-bg-color !important;
+  box-shadow: $card-shadow;
+
+  .navbar-brand {
+    font-weight: 700;
+    color: $secondary-color !important;
+  }
+
+  .nav-link {
+    color: $text-color !important;
+    transition: color $transition-speed ease;
+    padding: 0.5rem 1rem;
+    border-radius: $border-radius;
+    font-weight: 500;
+
+    &:hover {
+      color: $action-color !important;
+    }
+  }
+
+  .btn-outline-secondary {
+    border-color: $action-color;
+    color: $action-color;
+    &:hover {
+      background-color: $action-color;
+      color: white;
+    }
+  }
+}

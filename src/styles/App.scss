@@ -1,0 +1,185 @@
+/* ==========================================================================
+   NOWA, ENERGETYCZNA PALETA KOLORÓW I STYLE
+   ========================================================================== */
+
+/* --- ZMIENNE (inspirowane promocją "Back to School") --- */
+$action-color: #e60000;      // Energetyczna, główna czerwień
+$primary-color: #1a1a1a;     // Głęboka czerń/ciemny grafit
+$secondary-color: #333;    // Miększy grafit dla tekstów
+$accent-color: #9fcc35;      // Akcentowa, żywa zieleń
+
+$background-color: #ffffff;   // Czyste, białe tło
+$card-bg-color: #ffffff;      // Biały dla kart
+$text-color: #333;
+$light-text-color: #888;
+$border-color: #eaeaea;       // Jasnoszara ramka
+$font-family: 'Poppins', sans-serif;
+$border-radius: 4px;
+$card-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+$transition-speed: 0.2s;
+
+
+/* --- STYLE PODSTAWOWE I TYPOGRAFIA --- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: $font-family;
+  color: $text-color;
+  background-color: $background-color;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700; // Grubsze nagłówki
+  color: $primary-color;
+}
+
+
+/* --- NAWIGACJA --- */
+.navbar {
+  background-color: $background-color !important;
+  box-shadow: $card-shadow;
+
+  .navbar-brand {
+    font-weight: 700;
+    color: $primary-color !important;
+  }
+
+  .nav-link {
+    color: $secondary-color !important;
+    font-weight: 500;
+    transition: color $transition-speed ease;
+    &:hover {
+      color: $action-color !important;
+    }
+  }
+}
+
+
+/* --- PRZYCISKI --- */
+.btn {
+  border-radius: $border-radius;
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+  border: none;
+  transition: all $transition-speed ease;
+  text-transform: uppercase; // Wielkie litery
+  letter-spacing: 1px;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+}
+
+.btn-action {
+  background-color: $action-color;
+  color: white;
+  &:hover {
+    background-color: darken($action-color, 10%);
+  }
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+  &:hover {
+    background-color: lighten($primary-color, 15%);
+  }
+}
+
+
+/* --- NOWA STRONA GŁÓWNA (HERO SECTION) --- */
+.hero-section {
+  display: flex;
+  align-items: center;
+  background-color: $primary-color;
+  color: white;
+  min-height: 80vh;
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: $card-shadow;
+
+  .hero-content {
+    padding: 4rem;
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      color: $action-color;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: white;
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 2.5rem;
+    }
+  }
+
+  .hero-image {
+    img {
+      width: 100%;
+      height: 80vh;
+      object-fit: cover;
+    }
+  }
+}
+
+
+/* --- POZOSTAŁE STYLE (FORMULARZE, KARTY, TABELE) --- */
+/* Formularze */
+.form-container {
+  background-color: $card-bg-color;
+  padding: 2.5rem;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  max-width: 500px;
+  margin: 2rem auto;
+  h2 { text-align: center; margin-bottom: 2rem; }
+  .form-control {
+    border: 1px solid #ccc;
+    &:focus { border-color: $action-color; box-shadow: 0 0 0 2px rgba($action-color, 0.2); }
+  }
+}
+
+/* Karty */
+.card {
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  box-shadow: none;
+  .card-header {
+    background-color: #fafafa;
+    border-bottom: 1px solid $border-color;
+    font-weight: 600;
+  }
+}
+
+/* Tabele */
+.table {
+  thead th {
+    font-weight: 700;
+    color: $primary-color;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid $primary-color;
+  }
+}

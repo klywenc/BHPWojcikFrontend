@@ -1,0 +1,47 @@
+@use '../base/variables' as *;
+
+.btn {
+  border-radius: $border-radius;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border: none;
+  transition: all $transition-speed ease;
+  letter-spacing: 0.5px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+}
+
+.btn-action {
+  background-color: $action-color;
+  color: white;
+  &:hover {
+    background-color: darken($action-color, 8%);
+  }
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+  &:hover {
+    background-color: darken($primary-color, 8%);
+  }
+}
+
+.btn-danger {
+  background-color: $danger-color;
+  color: white;
+  &:hover {
+    background-color: darken($danger-color, 8%);
+  }
+}
+
+.btn-link {
+  color: $text-color;
+  text-decoration: none;
+  &:hover {
+    color: $action-color;
+  }
+}
