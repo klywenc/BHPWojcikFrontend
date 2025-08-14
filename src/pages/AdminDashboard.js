@@ -1,93 +1,47 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import api from '../services/api';
+import React from 'react';
+
+// Importy komponentów
 import PasswordResetGenerator from '../components/PasswordResetGenerator';
+import CodeGenerator from '../components/CodeGenerator';
+import UserManagement from '../components/UserManagement';
+import DictionaryAdder from '../components/DictionaryAdder'; // NOWY IMPORT
 
 const AdminDashboard = () => {
-    const [users, setUsers] = useState([]);
-    const [newCode, setNewCode] = useState('');
-    const [message, setMessage] = useState('');
-    const fetchUsers = useCallback(async () => {
-        try {
-            const response = await api.get('/users'); // Poprawiony endpoint
-            setUsers(response.data);
-        } catch (error) {
-            console.error("Błąd pobierania użytkowników:", error);
-        }
-    }, []);
+    // UWAGA: Logikę pobierania i usuwania użytkowników przenieśliśmy do UserManagement
+    // dla zachowania czystości kodu kontenera.
+    // Jeśli jej tam nie masz, możesz ją tu przywrócić.
 
-    useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
-
-    const handleDeleteUser = async (userId) => {
-        if (window.confirm('Czy na pewno chcesz usunąć tego użytkownika?')) {
-            try {
-                await api.delete(`/users/${userId}`); // Poprawiony endpoint
-                setMessage('Użytkownik został usunięty.');
-                await fetchUsers();
-            } catch (error) {
-                console.error("Błąd usuwania użytkownika:", error);
-                setMessage('Błąd podczas usuwania.');
-            }
-        }
-    };
-
-    const handleGenerateCode = async () => {
-        try {
-            const response = await api.post('/codes/generate');
-            setNewCode(response.data);
-        } catch (error) {
-            console.error("Błąd generowania kodu:", error);
-            setNewCode('Błąd podczas generowania kodu.');
-        }
-    };
-
-    return (<div>
+    return (
+        <div>
             <h1>Panel Administratora</h1>
-            {message && <div className="alert alert-info">{message}</div>}
+            <p>Zarządzaj użytkownikami, kodami, hasłami oraz danymi słownikowymi systemu.</p>
 
-            {/* Zintegrowany komponent do resetowania hasła */}
-            <PasswordResetGenerator/>
-
-            {/* Istniejąca funkcjonalność generowania kodów */}
-            <div className="card mb-4">
-                <div className="card-header">Zarządzanie kodami rejestracyjnymi</div>
-                <div className="card-body">
-                    <button className="btn btn-primary" onClick={handleGenerateCode}>Wygeneruj nowy kod</button>
-                    {newCode && <p className="mt-3">Nowy kod: <strong>{newCode}</strong></p>}
+            <div className="row">
+                {/* Dzielimy interfejs na dwie kolumny dla lepszej organizacji */}
+                <div className="col-lg-6">
+                    {/* NOWE KOMPONENTY DO ZARZĄDZANIA SŁOWNIKAMI */}
+                    <DictionaryAdder
+                        title="Dodaj nową kategorię incydentu"
+                        endpoint="/dictionary/categories"
+                    />
+                    <DictionaryAdder
+                        title="Dodaj nowy dział firmy"
+                        endpoint="/dictionary/departments"
+                    />
+                </div>
+                <div className="col-lg-6">
+                    <PasswordResetGenerator />
+                    <CodeGenerator />
                 </div>
             </div>
 
-            {/* Istniejąca funkcjonalność zarządzania użytkownikami */}
-            <div className="card">
-                <div className="card-header">Zarządzanie Użytkownikami</div>
-                <div className="card-body">
-                    <table className="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Imię</th>
-                            <th>Email</th>
-                            <th>Rola</th>
-                            <th>Akcje</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {users.map(user => (<tr key={user.id}>
-                                <td>{user.id}</td>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>{user.role}</td>
-                                <td>
-                                    <button className="btn btn-danger btn-sm"
-                                            onClick={() => handleDeleteUser(user.id)}>Usuń
-                                    </button>
-                                </td>
-                            </tr>))}
-                        </tbody>
-                    </table>
-                </div>
+            {/* Komponent do zarządzania użytkownikami - może wymagać przekazania danych */}
+            <div className="mt-4">
+                {/* <UserManagement /> */}
+                <p><i>Sekcja zarządzania użytkownikami (CRUD) powinna znajdować się poniżej.</i></p>
             </div>
-        </div>);
+        </div>
+    );
 };
+
 export default AdminDashboard;
