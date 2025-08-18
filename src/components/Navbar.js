@@ -14,7 +14,7 @@ const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
-                <Link className="navbar-brand" to="/">Aplikacja BHP</Link>
+                <Link className="navbar-brand" to="/"><img src="/meblewojcik.png" alt="Meble Wójcik" height="70" /></Link>
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item"><Link className="nav-link" to="/">Strona Główna</Link></li>
@@ -34,7 +34,7 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link to="/login" className="btn btn-outline-light me-2">Logowanie</Link>
+                                <Link to="/login" className="btn btn-action">Logowanie</Link>
                                 <Link to="/register" className="btn btn-warning">Rejestracja</Link>
                             </>
                         )}

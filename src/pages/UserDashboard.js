@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { saveAs } from 'file-saver'; // Krok 1: Importujemy zainstalowaną bibliotekę
 
 import IncidentList from '../components/IncidentList';
 import IncidentDetailsModal from '../components/IncidentDetailsModal';
@@ -14,7 +15,7 @@ const UserDashboard = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [selectedIncident, setSelectedIncident] = useState(null); // Przechowuje incydent dla modali
+    const [selectedIncident, setSelectedIncident] = useState(null);
     const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isAddModalOpen, setAddModalOpen] = useState(false);
@@ -48,12 +49,13 @@ const UserDashboard = () => {
 
     useEffect(() => {
         let result = [...incidents];
-
+        // WAŻNA POPRAWKA: Filtrowanie musi używać płaskich pól z DTO
         if (filters.categoryId) {
-            result = result.filter(inc => inc.category.id === parseInt(filters.categoryId, 10));
+            // Zakładając, że Twoje DTO ma pole `categoryId` lub podobne
+            result = result.filter(inc => inc.categoryName === categories.find(c => c.id === parseInt(filters.categoryId, 10))?.name);
         }
         if (filters.departmentId) {
-            result = result.filter(inc => inc.department.id === parseInt(filters.departmentId, 10));
+            result = result.filter(inc => inc.departmentName === departments.find(d => d.id === parseInt(filters.departmentId, 10))?.name);
         }
         if (filters.sortDate === 'asc') {
             result.sort((a, b) => new Date(a.reportedAt) - new Date(b.reportedAt));
@@ -61,9 +63,8 @@ const UserDashboard = () => {
         if (filters.sortDate === 'desc') {
             result.sort((a, b) => new Date(b.reportedAt) - new Date(a.reportedAt));
         }
-
         setFilteredIncidents(result);
-    }, [filters, incidents]);
+    }, [filters, incidents, categories, departments]);
 
 
     const handleFilterChange = (e) => {
@@ -88,26 +89,39 @@ const UserDashboard = () => {
         fetchData();
     };
 
-    // Placeholder dla generowania raportu
-    const handleGenerateReport = () => {
-        alert("Generowanie raportu... (Funkcjonalność do zaimplementowania)");
+    // Krok 2: Zastępujemy starą funkcję nową, w pełni działającą implementacją
+    const handleGenerateReport = async () => {
+        try {
+            const response = await api.get('/reports/incidents/xlsx', {
+                responseType: 'blob', // Kluczowe: traktuj odpowiedź jako plik
+            });
+
+            // Próba odczytania nazwy pliku z nagłówka odpowiedzi
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = 'raport_incydentow.xlsx'; // Nazwa domyślna
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch && filenameMatch.length > 1) {
+                    filename = filenameMatch[1];
+                }
+            }
+
+            // Użyj biblioteki file-saver do zapisania pliku
+            saveAs(response.data, filename);
+
+        } catch (error) {
+            console.error("Błąd podczas pobierania raportu:", error);
+            setError("Nie udało się wygenerować raportu. Sprawdź konsolę, aby uzyskać więcej informacji.");
+        }
     };
 
     // === RENDEROWANIE KOMPONENTU ===
 
-    // Wyświetlanie stanu ładowania
-    if (loading) {
-        return <div className="text-center p-5">Ładowanie danych...</div>;
-    }
-
-    // Wyświetlanie błędu
-    if (error) {
-        return <div className="alert alert-danger">{error}</div>;
-    }
+    if (loading) return <div className="text-center p-5">Ładowanie danych...</div>;
+    if (error) return <div className="alert alert-danger">{error}</div>;
 
     return (
         <div>
-            {/* Nagłówek z przyciskiem do dodawania */}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h1>Panel Pracownika - Zgłoszenia</h1>
                 <button onClick={() => setAddModalOpen(true)} className="btn btn-primary btn-lg">
@@ -115,7 +129,6 @@ const UserDashboard = () => {
                 </button>
             </div>
 
-            {/* Komponent listy, któremu przekazujemy wszystkie potrzebne dane i funkcje */}
             <IncidentList
                 incidents={filteredIncidents}
                 categories={categories}
@@ -124,10 +137,9 @@ const UserDashboard = () => {
                 onFilterChange={handleFilterChange}
                 onViewDetails={handleViewDetails}
                 onEdit={handleEdit}
-                onGenerateReport={handleGenerateReport}
+                onGenerateReport={handleGenerateReport} // Przekazujemy zaktualizowaną funkcję
             />
 
-            {/* Warunkowe renderowanie modali */}
             {isAddModalOpen && (
                 <IncidentAddModal
                     categories={categories}
@@ -136,14 +148,12 @@ const UserDashboard = () => {
                     onIncidentAdded={handleIncidentAdded}
                 />
             )}
-
             {isDetailsModalOpen && (
                 <IncidentDetailsModal
                     incident={selectedIncident}
                     onClose={() => setDetailsModalOpen(false)}
                 />
             )}
-
             {isEditModalOpen && (
                 <IncidentEditModal
                     incident={selectedIncident}

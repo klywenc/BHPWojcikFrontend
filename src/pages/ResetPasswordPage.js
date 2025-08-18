@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const ResetPasswordPage = () => {
-    // Odczytujemy token z URL, jeśli jest dostępny (np. /reset-password/jakiś-token)
     const { token: urlToken } = useParams();
     const navigate = useNavigate();
 
@@ -13,7 +12,6 @@ const ResetPasswordPage = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
-    // Jeśli token jest w URL, automatycznie wypełnij pole formularza
     useEffect(() => {
         if (urlToken) {
             setToken(urlToken);

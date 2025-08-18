@@ -6,7 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import ResetPasswordPage from './pages/ResetPasswordPage'; // Upewnij się, że ten import istnieje
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminDashboard from './pages/AdminDashboard';
 import TechnicianDashboard from './pages/TechnicianDashboard';
 import UserDashboard from './pages/UserDashboard';
@@ -17,9 +17,7 @@ function App() {
             <Navbar/>
             <div className="container my-5">
                 <Routes>
-                    {/* ====================================================== */}
-                    {/* ŚCIEŻKI PUBLICZNE (dostępne dla każdego)               */}
-                    {/* ====================================================== */}
+                    {/* Public Routes */}
                     <Route path="/" element={<HomePage/>}/>
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/register" element={<RegisterPage/>}/>
@@ -27,9 +25,7 @@ function App() {
                     <Route path="/reset-password/:token" element={<ResetPasswordPage/>}/>
 
 
-                    {/* ====================================================== */}
-                    {/* ŚCIEŻKI CHRONIONE (wymagają zalogowania i ról)        */}
-                    {/* ====================================================== */}
+                    {/* Protected Routes */}
                     <Route
                         path="/panel-pracownika"
                         element={<ProtectedRoute
@@ -50,15 +46,13 @@ function App() {
                         </ProtectedRoute>}
                     />
 
-                    {/* ====================================================== */}
-                    {/* ŚCIEŻKI POMOCNICZE I PRZEKIEROWANIA                   */}
-                    {/* ====================================================== */}
+                    {/* Unauthorized */}
                     <Route path="/unauthorized" element={<div className="text-center">
                         <h1>403 - Brak dostępu</h1>
                         <p>Nie masz uprawnień do wyświetlenia tej strony.</p>
                     </div>}/>
 
-                    {/* Przekierowanie na stronę główną, jeśli żadna ścieżka nie pasuje */}
+                    {/* Mainpage redirect */}
                     <Route path="*" element={<Navigate to="/"/>}/>
                 </Routes>
             </div>

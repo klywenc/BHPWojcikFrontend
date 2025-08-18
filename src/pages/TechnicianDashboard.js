@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import api from '../services/api';
-
-// Import komponentu do resetowania hasła
 import PasswordResetGenerator from '../components/PasswordResetGenerator';
 
 const TechnicianDashboard = () => {
@@ -21,10 +19,8 @@ const TechnicianDashboard = () => {
         <div>
             <h1>Panel Technika</h1>
 
-            {/* Zintegrowany komponent do resetowania hasła */}
             <PasswordResetGenerator />
 
-            {/* Istniejąca funkcjonalność generowania kodów */}
             <div className="card mb-4">
                 <div className="card-header">Generowanie kodu rejestracyjnego</div>
                 <div className="card-body">

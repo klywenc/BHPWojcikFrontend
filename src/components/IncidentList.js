@@ -10,7 +10,8 @@ const IncidentList = ({
                           onEdit,
                           onGenerateReport
                       }) => {
-    return (<div className="card">
+    return (
+        <div className="card">
             <div className="card-header">
                 Przeglądaj zgłoszone incydenty
             </div>
@@ -60,11 +61,19 @@ const IncidentList = ({
                         </tr>
                         </thead>
                         <tbody>
-                        {incidents.length > 0 ? (incidents.map(incident => (<tr key={incident.id}>
+                        {incidents.length > 0 ? (
+                            incidents.map(incident => (
+                                <tr key={incident.id}>
                                     <td>{incident.id}</td>
-                                    <td>{incident.description.substring(0, 50)}...</td>
-                                    <td>{incident.category.name}</td>
-                                    <td>{incident.department.name}</td>
+                                    {/* ZMIANA TUTAJ: Bezpieczne obcinanie opisu */}
+                                    <td>
+                                        {incident.description && incident.description.length > 50
+                                            ? `${incident.description.substring(0, 50)}...`
+                                            : incident.description}
+                                    </td>
+                                    {/* ZMIANA TUTAJ: Odwołujemy się do nowych, płaskich pól z DTO */}
+                                    <td>{incident.categoryName}</td>
+                                    <td>{incident.departmentName}</td>
                                     <td>{new Date(incident.reportedAt).toLocaleString()}</td>
                                     <td>
                                         <button onClick={() => onViewDetails(incident)}
@@ -74,14 +83,19 @@ const IncidentList = ({
                                                 className="btn btn-warning btn-sm">Edytuj
                                         </button>
                                     </td>
-                                </tr>))) : (<tr>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
                                 <td colSpan="6" className="text-center">Brak incydentów do wyświetlenia.</td>
-                            </tr>)}
+                            </tr>
+                        )}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>);
+        </div>
+    );
 };
 
 export default IncidentList;

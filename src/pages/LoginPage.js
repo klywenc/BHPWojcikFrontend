@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-// Zaktualizuj ten import, aby zawierał Link
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
@@ -24,7 +23,6 @@ const LoginPage = () => {
     };
 
     return (
-        // Użyj kontenera, który stylowaliśmy wcześniej
         <div className="form-container">
             <form onSubmit={handleSubmit}>
                 <h2>Logowanie</h2>
