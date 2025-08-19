@@ -45,6 +45,7 @@ function App() {
                             <AdminDashboard/>
                         </ProtectedRoute>}
                     />
+                    <Route path="/password/reset/:token" element={<ResetPasswordPage />} />
 
                     {/* Unauthorized */}
                     <Route path="/unauthorized" element={<div className="text-center">

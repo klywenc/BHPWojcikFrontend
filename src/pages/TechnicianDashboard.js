@@ -1,31 +1,23 @@
-import React, { useState } from 'react';
-import api from '../services/api';
+import React from 'react';
 import PasswordResetGenerator from '../components/PasswordResetGenerator';
+import InvitationSender from '../components/InvitationSender'; // 1. Importujemy nowy komponent
 
 const TechnicianDashboard = () => {
-    const [newCode, setNewCode] = useState('');
-
-    const handleGenerateCode = async () => {
-        try {
-            const response = await api.post('/codes/generate');
-            setNewCode(response.data);
-        } catch (error) {
-            console.error("Błąd generowania kodu:", error);
-            setNewCode('Błąd podczas generowania kodu.');
-        }
-    };
+    // 2. Cała logika generowania kodu (useState, handleGenerateCode) jest już niepotrzebna
+    // i została przeniesiona do InvitationSender.
 
     return (
-        <div>
+        <div className="container mt-4">
             <h1>Panel Technika</h1>
+            <p>Zarządzaj zaproszeniami do systemu oraz hasłami użytkowników.</p>
 
-            <PasswordResetGenerator />
-
-            <div className="card mb-4">
-                <div className="card-header">Generowanie kodu rejestracyjnego</div>
-                <div className="card-body">
-                    <button className="btn btn-primary" onClick={handleGenerateCode}>Wygeneruj nowy kod</button>
-                    {newCode && <p className="mt-3">Nowy kod: <strong>{newCode}</strong></p>}
+            <div className="row mt-4">
+                <div className="col-lg-6">
+                    {/* 3. Wstawiamy nasz nowy komponent do wysyłania zaproszeń */}
+                    <InvitationSender />
+                </div>
+                <div className="col-lg-6">
+                    <PasswordResetGenerator />
                 </div>
             </div>
         </div>
