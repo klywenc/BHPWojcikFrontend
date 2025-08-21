@@ -48,8 +48,7 @@ const LoginPage = () => {
                     />
                 </div>
                 <button type="submit" className="btn btn-action w-100 mt-3">Zaloguj</button>
-
-                {/* DODANA SEKCJA */}
+                
                 <div className="text-center mt-4">
                     <Link to="/reset-password">Zapomniałem hasła</Link>
                 </div>

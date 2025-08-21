@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
-import { saveAs } from 'file-saver'; // Krok 1: Importujemy zainstalowaną bibliotekę
+import { saveAs } from 'file-saver';
 
 import IncidentList from '../components/IncidentList';
 import IncidentDetailsModal from '../components/IncidentDetailsModal';
@@ -8,36 +8,64 @@ import IncidentEditModal from '../components/IncidentEditModal';
 import IncidentAddModal from '../components/IncidentAddModal';
 
 const UserDashboard = () => {
+    // --- Stany ---
     const [incidents, setIncidents] = useState([]);
     const [filteredIncidents, setFilteredIncidents] = useState([]);
     const [categories, setCategories] = useState([]);
     const [departments, setDepartments] = useState([]);
-
+    const [locations, setLocations] = useState([]);
+    const [directors, setDirectors] = useState([]);
+    const [statuses, setStatuses] = useState([]);
+    const [severities, setSeverities] = useState([]);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedIncident, setSelectedIncident] = useState(null);
     const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isAddModalOpen, setAddModalOpen] = useState(false);
-
     const [filters, setFilters] = useState({ categoryId: '', departmentId: '', sortDate: '' });
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
-            const [incidentsRes, categoriesRes, departmentsRes] = await Promise.all([
+            const [
+                incidentsRes,
+                categoriesRes,
+                departmentsRes,
+                locationsRes,
+                usersRes,
+                statusesRes,
+                severitiesRes
+            ] = await Promise.all([
                 api.get('/incidents'),
                 api.get('/dictionaries/categories'),
-                api.get('/dictionaries/departments')
+                api.get('/dictionaries/departments'),
+                api.get('/dictionaries/locations'),
+                api.get('/users'),
+                api.get('/admin/incidents/statuses'),
+                api.get('/admin/incidents/severities')
             ]);
+
             setIncidents(incidentsRes.data);
             setFilteredIncidents(incidentsRes.data);
+
             setCategories(categoriesRes.data);
             setDepartments(departmentsRes.data);
+            setLocations(locationsRes.data);
+            setStatuses(statusesRes.data);
+            setSeverities(severitiesRes.data);
+
+            const allUsers = usersRes.data;
+            setDirectors(allUsers.filter(u => u.role === 'ROLE_DYREKTOR'));
+
+            // TODO: ustaw zalogowanego użytkownika (jeżeli masz AuthContext)
+            // setUser(auth.user);
+
         } catch (err) {
-            setError('Nie udało się załadować danych. Sprawdź połączenie z serwerem.');
             console.error(err);
+            setError('Nie udało się załadować danych. Sprawdź połączenie z serwerem i swoje uprawnienia.');
         } finally {
             setLoading(false);
         }
@@ -47,15 +75,16 @@ const UserDashboard = () => {
         fetchData();
     }, [fetchData]);
 
+    // --- Filtracja incydentów ---
     useEffect(() => {
         let result = [...incidents];
-        // WAŻNA POPRAWKA: Filtrowanie musi używać płaskich pól z DTO
         if (filters.categoryId) {
-            // Zakładając, że Twoje DTO ma pole `categoryId` lub podobne
-            result = result.filter(inc => inc.categoryName === categories.find(c => c.id === parseInt(filters.categoryId, 10))?.name);
+            const categoryName = categories.find(c => c.id === parseInt(filters.categoryId, 10))?.name;
+            result = result.filter(inc => inc.categoryName === categoryName);
         }
         if (filters.departmentId) {
-            result = result.filter(inc => inc.departmentName === departments.find(d => d.id === parseInt(filters.departmentId, 10))?.name);
+            const departmentName = departments.find(d => d.id === parseInt(filters.departmentId, 10))?.name;
+            result = result.filter(inc => inc.departmentName === departmentName);
         }
         if (filters.sortDate === 'asc') {
             result.sort((a, b) => new Date(a.reportedAt) - new Date(b.reportedAt));
@@ -66,60 +95,44 @@ const UserDashboard = () => {
         setFilteredIncidents(result);
     }, [filters, incidents, categories, departments]);
 
-
+    // --- Handlery ---
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
-
     const handleViewDetails = (incident) => {
         setSelectedIncident(incident);
         setDetailsModalOpen(true);
     };
-
     const handleEdit = (incident) => {
         setSelectedIncident(incident);
         setEditModalOpen(true);
     };
-
     const handleUpdate = (updatedIncident) => {
         setIncidents(prev => prev.map(inc => inc.id === updatedIncident.id ? updatedIncident : inc));
     };
-
     const handleIncidentAdded = () => {
         fetchData();
     };
-
-    // Krok 2: Zastępujemy starą funkcję nową, w pełni działającą implementacją
     const handleGenerateReport = async () => {
         try {
-            const response = await api.get('/reports/incidents/xlsx', {
-                responseType: 'blob', // Kluczowe: traktuj odpowiedź jako plik
-            });
-
-            // Próba odczytania nazwy pliku z nagłówka odpowiedzi
+            const response = await api.get('/reports/incidents/xlsx', { responseType: 'blob' });
             const contentDisposition = response.headers['content-disposition'];
-            let filename = 'raport_incydentow.xlsx'; // Nazwa domyślna
+            let filename = 'raport_incydentow.xlsx';
             if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-                if (filenameMatch && filenameMatch.length > 1) {
-                    filename = filenameMatch[1];
-                }
+                const match = contentDisposition.match(/filename="(.+)"/);
+                if (match && match[1]) filename = match[1];
             }
-
-            // Użyj biblioteki file-saver do zapisania pliku
             saveAs(response.data, filename);
-
-        } catch (error) {
-            console.error("Błąd podczas pobierania raportu:", error);
-            setError("Nie udało się wygenerować raportu. Sprawdź konsolę, aby uzyskać więcej informacji.");
+        } catch (err) {
+            console.error(err);
+            setError('Nie udało się wygenerować raportu.');
         }
     };
-
-    // === RENDEROWANIE KOMPONENTU ===
 
     if (loading) return <div className="text-center p-5">Ładowanie danych...</div>;
     if (error) return <div className="alert alert-danger">{error}</div>;
 
+    // --- Render ---
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -137,28 +150,37 @@ const UserDashboard = () => {
                 onFilterChange={handleFilterChange}
                 onViewDetails={handleViewDetails}
                 onEdit={handleEdit}
-                onGenerateReport={handleGenerateReport} // Przekazujemy zaktualizowaną funkcję
+                onGenerateReport={handleGenerateReport}
             />
 
             {isAddModalOpen && (
                 <IncidentAddModal
                     categories={categories}
                     departments={departments}
+                    locations={locations}
+                    directors={directors}
                     onClose={() => setAddModalOpen(false)}
                     onIncidentAdded={handleIncidentAdded}
                 />
             )}
+
             {isDetailsModalOpen && (
                 <IncidentDetailsModal
                     incident={selectedIncident}
                     onClose={() => setDetailsModalOpen(false)}
                 />
             )}
+
             {isEditModalOpen && (
                 <IncidentEditModal
                     incident={selectedIncident}
+                    userRole={user?.role}
                     categories={categories}
                     departments={departments}
+                    locations={locations}
+                    directors={directors}
+                    statuses={statuses}
+                    severities={severities}
                     onClose={() => setEditModalOpen(false)}
                     onUpdate={handleUpdate}
                 />

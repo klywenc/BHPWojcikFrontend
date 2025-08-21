@@ -19,11 +19,9 @@ const Navbar = () => {
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item"><Link className="nav-link" to="/">Strona Główna</Link></li>
                         {user && <li className="nav-item"><Link className="nav-link" to="/panel-pracownika">Panel Pracownika</Link></li>}
-                        {user && (user.role === 'ROLE_TECHNIK' || user.role === 'ROLE_ADMINISTRATOR') && (
-                            <li className="nav-item"><Link className="nav-link" to="/panel-technika">Panel Technika</Link></li>
-                        )}
+                        {user && (user.role === 'ROLE_TECHNIK' || user.role === 'ROLE_ADMINISTRATOR')}
                         {user && user.role === 'ROLE_ADMINISTRATOR' && (
-                            <li className="nav-item"><Link className="nav-link" to="/panel-admina">Panel Admina</Link></li>
+                            <li className="nav-item"><Link className="nav-link" to="/panel-admina">Panel Administracyjny</Link></li>
                         )}
                     </ul>
                     <div className="d-flex">

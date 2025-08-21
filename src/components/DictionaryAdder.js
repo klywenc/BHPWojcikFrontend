@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import api from '../services/api';
 
 /**
- * Reużywalny komponent do dodawania nowych pozycji do słownika (np. kategorii, działów).
- * @param {string} title - Tytuł wyświetlany na karcie, np. "Dodaj nową kategorię".
- * @param {string} endpoint - Endpoint API, na który zostanie wysłane żądanie POST, np. "/incidents/categories".
- * @param {function} [onItemAdded] - Opcjonalna funkcja zwrotna wywoływana po pomyślnym dodaniu elementu.
+ * Komponent dodawania pozycji.
+ * @param {string} title
+ * @param {string} endpoint - Endpoint API -> POST np. /incidents/categories
+ * @param {function} [onItemAdded] - callback.
  */
 const DictionaryAdder = ({ title, endpoint, onItemAdded }) => {
     const [name, setName] = useState('');
@@ -22,9 +22,8 @@ const DictionaryAdder = ({ title, endpoint, onItemAdded }) => {
         try {
             await api.post(endpoint, { name });
             setMessage(`Pozycja "${name}" została pomyślnie dodana.`);
-            setName(''); // Wyczyść pole po sukcesie
-
-            // Jeśli przekazano funkcję zwrotną, wywołaj ją
+            setName(''); 
+            
             if (onItemAdded) {
                 onItemAdded();
             }

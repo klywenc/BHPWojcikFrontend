@@ -61,7 +61,7 @@ const InvitationSender = () => {
                         />
                     </div>
 
-                    {/* Komunikaty o sukcesie lub błędzie */}
+                    {/* CALLBACK */}
                     {successMessage && <div className="alert alert-success">{successMessage}</div>}
                     {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
