@@ -19,7 +19,12 @@ const Navbar = () => {
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item"><Link className="nav-link" to="/">Strona Główna</Link></li>
                         {user && <li className="nav-item"><Link className="nav-link" to="/panel-pracownika">Panel Pracownika</Link></li>}
-                        {user && (user.role === 'ROLE_TECHNIK' || user.role === 'ROLE_ADMINISTRATOR')}
+
+                        {/* NOWY LINK DO PANELU AUDYTÓW */}
+                        {user && (user.role === 'ROLE_TECHNIK' || user.role === 'ROLE_ADMINISTRATOR') && (
+                            <li className="nav-item"><Link className="nav-link" to="/audits">Panel Audytów</Link></li>
+                        )}
+
                         {user && user.role === 'ROLE_ADMINISTRATOR' && (
                             <li className="nav-item"><Link className="nav-link" to="/panel-admina">Panel Administracyjny</Link></li>
                         )}

@@ -16,16 +16,16 @@ const PasswordResetGenerator = () => {
         try {
             const response = await api.post('/password/generate-reset-token', { email });
             setGeneratedToken(response.data);
-            setMessage('Token został wygenerowany pomyślnie. Skopiuj go i przekaż użytkownikowi.');
+            setMessage('Link resetujący wygenerowano pomyślnie');
         } catch (err) {
-            setError(err.response?.data?.message || 'Nie udało się wygenerować tokenu. Sprawdź, czy email jest poprawny.');
+            setError(err.response?.data?.message || 'Nie udało się wygenerować wiadomości. Sprawdź, czy email jest poprawny.');
         }
     };
 
     return (
         <div className="card mb-4">
             <div className="card-header">
-                Wygeneruj token do resetu hasła
+                Resetowanie hasła
             </div>
             <div className="card-body">
                 <form onSubmit={handleSubmit}>
@@ -40,7 +40,7 @@ const PasswordResetGenerator = () => {
                             className="form-control"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="np. uzytkownik@bhp.pl"
+                            placeholder="np. x.nazwisko@meblewojcik.pl"
                             required
                         />
                     </div>

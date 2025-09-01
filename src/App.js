@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
+import AuditPanel from './pages/AuditPanel';
 import DebugPanel from "./pages/DebugPanel";
 
 
@@ -23,7 +24,11 @@ function App() {
                 <Route path="/reset-password" element={<ResetPasswordPage/>}/>
                 <Route path="/reset-password/:token" element={<ResetPasswordPage/>}/>
 
-
+                <Route path="/audits" element={
+                    <ProtectedRoute allowedRoles={['ROLE_ADMINISTRATOR', 'ROLE_TECHNIK']}>
+                        <AuditPanel />
+                    </ProtectedRoute>
+                } />
                 <Route
                     path="/panel-pracownika"
                     element={<ProtectedRoute
