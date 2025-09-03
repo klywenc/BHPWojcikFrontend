@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import UserEditModal from './UserEditModal';
 
-// Komponent teraz oczekuje propsa 'availableDepartments'
 const UserManagement = ({ availableDepartments }) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -127,7 +126,7 @@ const UserManagement = ({ availableDepartments }) => {
                 <UserEditModal
                     user={selectedUser}
                     availableRoles={availableRoles}
-                    availableDepartments={availableDepartments} // Przekazujemy listę działów do modala
+                    availableDepartments={availableDepartments}
                     onClose={handleCloseModal}
                     onUserUpdated={handleUserUpdated}
                 />

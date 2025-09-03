@@ -9,7 +9,6 @@ const AuditPanel = () => {
     const [selectedAudit, setSelectedAudit] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Stan do zarządzania widocznością modala wyboru użytkownika
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
     const fetchData = useCallback(async () => {
@@ -17,7 +16,7 @@ const AuditPanel = () => {
         try {
             const [auditsResponse, usersResponse] = await Promise.all([
                 api.get('/audits'),
-                api.get('/users') // Pobieramy listę wszystkich użytkowników do wyboru
+                api.get('/users')
             ]);
             setAudits(auditsResponse.data);
             setAllUsers(usersResponse.data);
@@ -70,13 +69,11 @@ const AuditPanel = () => {
         }
     };
 
-    // Ta funkcja jest wywoływana, gdy użytkownik kliknie przycisk "Dodaj członka"
     const handleAddMemberClick = () => {
         if (!selectedAudit) return;
         setIsUserModalOpen(true); // Otwiera modal
     };
 
-    // Ta funkcja jest wywoływana przez modal po potwierdzeniu wyboru
     const handleConfirmUserSelection = async (userId) => {
         try {
             const response = await api.post(`/audits/${selectedAudit.id}/members/${userId}`);
@@ -101,7 +98,6 @@ const AuditPanel = () => {
 
     return (
         <div className="container mt-4">
-            {/* Renderujemy modal - jest niewidoczny, dopóki isUserModalOpen nie jest true */}
             <SelectionModal
                 isOpen={isUserModalOpen}
                 onClose={() => setIsUserModalOpen(false)}

@@ -3,12 +3,10 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 const DebugPanel = () => {
-    // Stany dla "Zdrowia serwisów"
     const [healthStatus, setHealthStatus] = useState(null);
     const [isHealthLoading, setIsHealthLoading] = useState(false);
     const [healthError, setHealthError] = useState('');
 
-    // Stany dla "Statusu storage"
     const [storageStatus, setStorageStatus] = useState(null);
     const [isStorageLoading, setIsStorageLoading] = useState(false);
     const [storageError, setStorageError] = useState('');
@@ -41,14 +39,12 @@ const DebugPanel = () => {
         }
     };
 
-    // Helper do formatowania statusu UP/DOWN
     const getStatusBadge = (status) => {
         if (!status) return null;
         const isUp = status.startsWith('UP');
         return <span className={`badge bg-${isUp ? 'success' : 'danger'}`}>{status}</span>;
     };
 
-    // Helper do formatowania bajtów na czytelny format
     const formatBytes = (bytes, decimals = 2) => {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
