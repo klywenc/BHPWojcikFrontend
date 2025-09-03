@@ -31,6 +31,7 @@ const IncidentAddModal = ({categories, departments, locations, directors, onClos
         setError('');
         setIsSubmitting(true);
         const formData = new FormData();
+        // Upewniamy się, że wszystkie pola są dodawane do formularza
         formData.append('description', description);
         formData.append('categoryId', categoryId);
         formData.append('departmentId', departmentId);
@@ -58,7 +59,8 @@ const IncidentAddModal = ({categories, departments, locations, directors, onClos
         }
     };
 
-    return (<div className="modal show" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+    return (
+        <div className="modal show" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.5)'}}>
             <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content">
                     <form onSubmit={handleSubmit}>
@@ -69,11 +71,21 @@ const IncidentAddModal = ({categories, departments, locations, directors, onClos
                         </div>
                         <div className="modal-body">
                             {error && <div className="alert alert-danger">{error}</div>}
+
                             <div className="mb-3">
-                                <label className="form-label">Opis zdarzenia</label>
-                                <div style={{height: '250px', paddingBottom: '50px'}}>
-                                </div>
+                                <label htmlFor="incident-description" className="form-label">Opis zdarzenia</label>
+                                <textarea
+                                    id="incident-description"
+                                    className="form-control"
+                                    rows="5"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="Dokładnie opisz, co się stało, gdzie i kiedy..."
+                                    required
+                                    disabled={isSubmitting}
+                                ></textarea>
                             </div>
+
                             <div className="row">
                                 <div className="col-md-6 mb-3">
                                     <label htmlFor="add-categoryId" className="form-label">Kategoria</label>
@@ -136,7 +148,8 @@ const IncidentAddModal = ({categories, departments, locations, directors, onClos
                     </form>
                 </div>
             </div>
-        </div>);
+        </div>
+    );
 };
 
 export default IncidentAddModal;

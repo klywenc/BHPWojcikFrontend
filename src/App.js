@@ -29,6 +29,7 @@ function App() {
                         <AuditPanel />
                     </ProtectedRoute>
                 } />
+                <Route path="/register/:registrationCode" element={<RegisterPage />} />
                 <Route
                     path="/panel-pracownika"
                     element={<ProtectedRoute
