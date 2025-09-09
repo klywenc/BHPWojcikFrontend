@@ -2,10 +2,14 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
+
 import IncidentList from '../components/IncidentList';
 import IncidentEditModal from '../components/IncidentEditModal';
 import IncidentAddModal from '../components/IncidentAddModal';
-import SelectionModal from '../components/SelectionModal'; // Importujemy nowy komponent
+import SelectionModal from '../components/SelectionModal';
+
+import { Title, PageHeader, Button } from '../components/Styled';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const UserDashboard = () => {
     const { user } = useContext(AuthContext);
@@ -27,8 +31,6 @@ const UserDashboard = () => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const [filters, setFilters] = useState({ categoryId: '', departmentId: '', locationId: '' });
-
-    // Stan do zarządzania widocznością modala wyboru audytu
     const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
     // Pobieranie danych
@@ -36,7 +38,16 @@ const UserDashboard = () => {
         setLoading(true);
         setError('');
         try {
-            const [incidentsRes, categoriesRes, departmentsRes, locationsRes, usersRes, statusesRes, severitiesRes, auditsRes] = await Promise.all([
+            const [
+                incidentsRes,
+                categoriesRes,
+                departmentsRes,
+                locationsRes,
+                usersRes,
+                statusesRes,
+                severitiesRes,
+                auditsRes,
+            ] = await Promise.all([
                 api.get('/incidents'),
                 api.get('/dictionaries/categories'),
                 api.get('/dictionaries/departments'),
@@ -44,7 +55,7 @@ const UserDashboard = () => {
                 api.get('/users'),
                 api.get('/admin/incidents/statuses'),
                 api.get('/admin/incidents/severities'),
-                api.get('/audits')
+                api.get('/audits'),
             ]);
             setIncidents(incidentsRes.data);
             setFilteredIncidents(incidentsRes.data);
@@ -53,7 +64,7 @@ const UserDashboard = () => {
             setLocations(locationsRes.data);
             setStatuses(statusesRes.data);
             setSeverities(severitiesRes.data);
-            setDirectors(usersRes.data.filter(u => u.role === 'ROLE_DYREKTOR'));
+            setDirectors(usersRes.data.filter((u) => u.role === 'ROLE_DYREKTOR'));
             setAudits(auditsRes.data);
         } catch (err) {
             console.error(err);
@@ -67,32 +78,34 @@ const UserDashboard = () => {
         fetchData();
     }, [fetchData]);
 
-    // Filtracja incydentów
+    // Filtracja
     useEffect(() => {
         let result = [...incidents];
         if (filters.categoryId) {
-            const categoryName = categories.find(c => c.id === parseInt(filters.categoryId, 10))?.name;
-            result = result.filter(inc => inc.categoryName === categoryName);
+            const categoryName = categories.find((c) => c.id === parseInt(filters.categoryId, 10))?.name;
+            result = result.filter((inc) => inc.categoryName === categoryName);
         }
         if (filters.departmentId) {
-            const departmentName = departments.find(d => d.id === parseInt(filters.departmentId, 10))?.name;
-            result = result.filter(inc => inc.departmentName === departmentName);
+            const departmentName = departments.find((d) => d.id === parseInt(filters.departmentId, 10))?.name;
+            result = result.filter((inc) => inc.departmentName === departmentName);
         }
         if (filters.locationId) {
-            const locationName = locations.find(l => l.id === parseInt(filters.locationId, 10))?.name;
-            result = result.filter(inc => inc.locationName === locationName);
+            const locationName = locations.find((l) => l.id === parseInt(filters.locationId, 10))?.name;
+            result = result.filter((inc) => inc.locationName === locationName);
         }
         setFilteredIncidents(result);
     }, [filters, incidents, categories, departments, locations]);
 
     // Handlery
-    const handleFilterChange = (e) => setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleFilterChange = (e) => setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     const handleEdit = (incident) => {
         setSelectedIncident(incident);
         setEditModalOpen(true);
     };
-    const handleUpdate = (updatedIncident) => setIncidents(prev => prev.map(inc => inc.id === updatedIncident.id ? updatedIncident : inc));
+    const handleUpdate = (updatedIncident) =>
+        setIncidents((prev) => prev.map((inc) => (inc.id === updatedIncident.id ? updatedIncident : inc)));
     const handleIncidentAdded = () => fetchData();
+
     const handleGenerateReport = async () => {
         try {
             const response = await api.get('/reports/incidents/xlsx', { responseType: 'blob' });
@@ -108,46 +121,64 @@ const UserDashboard = () => {
             setError('Nie udało się wygenerować raportu.');
         }
     };
+
+    const handlePrintSelected = async () => {
+        if (selectedIncidentIds.length === 0) return;
+
+        try {
+            const response = await api.post(
+                '/reports/incidents/selected-odt',
+                { incidentIds: selectedIncidentIds },
+                { responseType: 'blob' }
+            );
+
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = 'wybrane_incydenty.odt';
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="(.+)"/);
+                if (match && match[1]) filename = match[1];
+            }
+            saveAs(response.data, filename);
+        } catch (err) {
+            console.error("Błąd podczas generowania raportu dla wybranych incydentów:", err);
+            alert("Nie udało się wygenerować raportu.");
+        }
+    };
+
     const handleSelectionChange = (incidentId) => {
-        setSelectedIncidentIds(prev =>
-            prev.includes(incidentId)
-                ? prev.filter(id => id !== incidentId)
-                : [...prev, incidentId]
+        setSelectedIncidentIds((prev) =>
+            prev.includes(incidentId) ? prev.filter((id) => id !== incidentId) : [...prev, incidentId]
         );
     };
 
-    // Ta funkcja jest wywoływana, gdy użytkownik kliknie przycisk "Przypisz do audytu"
     const handleAssignToAuditClick = () => {
         if (selectedIncidentIds.length === 0) {
-            alert("Zaznacz przynajmniej jeden incydent, aby go przypisać.");
+            alert('Zaznacz przynajmniej jeden incydent, aby go przypisać.');
             return;
         }
-        setIsAuditModalOpen(true); // Otwiera modal wyboru audytu
+        setIsAuditModalOpen(true);
     };
 
-    // Ta funkcja jest wywoływana przez modal po potwierdzeniu wyboru audytu
     const handleConfirmAuditSelection = async (auditId) => {
         try {
             await api.post('/audits/incidents/assign', {
                 auditId: auditId,
-                incidentIds: selectedIncidentIds
+                incidentIds: selectedIncidentIds,
             });
-            alert("Pomyślnie przypisano incydenty.");
-            setSelectedIncidentIds([]); // Wyczyść zaznaczenie
-            fetchData(); // Odśwież dane, aby zobaczyć zmiany
+            alert('Pomyślnie przypisano incydenty.');
+            setSelectedIncidentIds([]);
+            fetchData();
         } catch (err) {
-            alert("Wystąpił błąd podczas przypisywania incydentów.");
+            alert('Wystąpił błąd podczas przypisywania incydentów.');
             console.error(err);
         }
     };
 
-    if (loading) return <div className="text-center p-5">Ładowanie danych...</div>;
+    if (loading) return <LoadingSpinner />;
     if (error) return <div className="alert alert-danger">{error}</div>;
 
-    // Render
     return (
         <div className="container mt-5">
-            {/* Renderujemy modal - jest niewidoczny, dopóki isAuditModalOpen nie jest true */}
             <SelectionModal
                 isOpen={isAuditModalOpen}
                 onClose={() => setIsAuditModalOpen(false)}
@@ -157,16 +188,28 @@ const UserDashboard = () => {
                 displayField="title"
             />
 
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <PageHeader>
+                <Title>Panel Pracownika</Title>
                 <div>
-                    <button onClick={handleAssignToAuditClick} className="btn btn-info me-2" disabled={selectedIncidentIds.length === 0}>
+                    <Button
+                        onClick={handleAssignToAuditClick}
+                        variant="primary"
+                        disabled={selectedIncidentIds.length === 0}
+                        style={{ marginRight: '1rem' }}
+                    >
                         Przypisz do Audytu ({selectedIncidentIds.length})
-                    </button>
-                    <button onClick={() => setAddModalOpen(true)} className="btn btn-primary btn-lg">
-                        + Dodaj Nowy Incydent
-                    </button>
+                    </Button>
+                    <Button
+                        onClick={handlePrintSelected}
+                        variant="primary"
+                        disabled={selectedIncidentIds.length === 0}
+                        style={{ marginRight: '1rem' }}
+                    >
+                        Drukuj Zaznaczone ({selectedIncidentIds.length})
+                    </Button>
+                    <Button onClick={() => setAddModalOpen(true)}>+ Dodaj Incydent</Button>
                 </div>
-            </div>
+            </PageHeader>
 
             <IncidentList
                 incidents={filteredIncidents}
@@ -179,6 +222,8 @@ const UserDashboard = () => {
                 onGenerateReport={handleGenerateReport}
                 onSelectionChange={handleSelectionChange}
                 selectedIncidentIds={selectedIncidentIds}
+                statuses={statuses}
+                onUpdate={handleUpdate}
             />
 
             {isAddModalOpen && (

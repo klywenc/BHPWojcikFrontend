@@ -2,6 +2,25 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
+import styled from 'styled-components';
+import { FormContainer, FormGroup, FormLabel, Input, Button } from '../components/Styled';
+
+const StyledLink = styled(Link)`
+  display: block;
+  text-align: center;
+  margin-top: 1.5rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+const ErrorMessage = styled.div`
+  background-color: ${({ theme }) => theme.colors.danger}1A; // 10% opacity
+  color: ${({ theme }) => theme.colors.danger};
+  padding: 1rem;
+  border-radius: ${({ theme }) => theme.borderRadius};
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border: 1px solid ${({ theme }) => theme.colors.danger}4D; // 30% opacity
+`;
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -23,37 +42,22 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="form-container">
+        <FormContainer>
+            <h2 style={{ marginBottom: '2rem' }}>Logowanie</h2>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
             <form onSubmit={handleSubmit}>
-                <h2>Logowanie</h2>
-                {error && <div className="alert alert-danger">{error}</div>}
-                <div className="mb-3">
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        placeholder="Email"
-                        required
-                        className="form-control"
-                    />
-                </div>
-                <div className="mb-3">
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        placeholder="Hasło"
-                        required
-                        className="form-control"
-                    />
-                </div>
-                <button type="submit" className="btn btn-action w-100 mt-3">Zaloguj</button>
-                
-                <div className="text-center mt-4">
-                    <Link to="/reset-password">Zapomniałem hasła</Link>
-                </div>
+                <FormGroup>
+                    <FormLabel htmlFor="email">Adres e-mail</FormLabel>
+                    <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                </FormGroup>
+                <FormGroup>
+                    <FormLabel htmlFor="password">Hasło</FormLabel>
+                    <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                </FormGroup>
+                <Button type="submit" style={{ width: '100%' }}>Zaloguj</Button>
+                <StyledLink to="/reset-password">Zapomniałem hasła</StyledLink>
             </form>
-        </div>
+        </FormContainer>
     );
 };
 
